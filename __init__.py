@@ -38,7 +38,7 @@ def histogramme():
 
 @app.route('/commits')
 def commit():
-        response = urlopen('https://api.github.com/repos/Rania979/5MCSI_Metriques/commits')
+        response = urlopen('https://api.github.com/repos/Jeksos/5MCSI_Metriques/commits')
         raw_content = response.read()
         json_content = json.loads(raw_content.decode('utf-8'))
         results = []
@@ -55,7 +55,7 @@ def commit():
 def commit_date(date_string):
     date_object = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
     minutes = date_object.minute
-    response = urlopen('https://api.github.com/repos/Rania979/5MCSI_Metriques/commits')
+    response = urlopen('https://api.github.com/repos/Jeksos/5MCSI_Metriques/commits')
     raw_content = response.read()
     json_content = json.loads(raw_content.decode('utf-8'))
    
