@@ -1,60 +1,40 @@
 <html>
   <head>
+    <meta charset="UTF-8" />
+    <title>Metrique</title>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-
-      function loadJSON(path, success, error){
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function()
-        {
-          if (xhr.readyState === XMLHttpRequest.DONE) {
-              if (xhr.status === 200) {
-                  if (success)
-                      success(JSON.parse(xhr.responseText));
-              } else {
-                  if (error)
-                      error(xhr);
-              }
-          }
-        };
-        xhr.open("GET", path, true);
-        xhr.send();
-      }
-     
-      google.charts.load("current", {packages:["corechart"]});
-      google.charts.setOnLoadCallback(drawChart);
-      function drawChart() {
-
-       
-
-        loadJSON('https://rania9772.alwaysdata.net/tawarano/',
-         function(data) {
-           var resultat=data.results;
-           var tableau = [['Jour', 'Température']];
-
-           for(var i=0;i<resultat.length;i++){
-             tableau.push([new Date(resultat[i].Jour * 1000).toString(), resultat[i].temp]);
-           }
-           
-           var data = google.visualization.arrayToDataTable(tableau);
-
-            var options = {
-            title: 'Histogramme',
-            legend: { position: 'none' },
-            };
-
-            var chart = new google.visualization.Histogram(document.getElementById('chart_div'));
-            chart.draw(data, options);
-           
-          },
-         function(xhr) { console.error(xhr); }
-        );
-       
-       
-      }
-    </script>
   </head>
   <body>
-    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+    <div id="chart_div"></div>
+    <script>
+      google.charts.load('current', { packages: ['corechart'] });
+      google.charts.setOnLoadCallback(drawBackgroundColor);
+     function drawBackgroundColor() {
+    function drawChart(data) {
+    // Convertir les données récupérées en un tableau utilisable par Google Charts
+    var dataTable = new google.visualization.DataTable();
+    dataTable.addColumn('string', 'Date');
+    dataTable.addColumn('number', 'Valeur');
+    data.results.forEach(entry => {
+      var date = new Date(entry.Jour * 1000);
+      dataTable.addRow([date.toLocaleDateString(), entry.temp]);
+    });
+    // Configurer les options du graphique en ligne
+    var options = {
+      title: 'Évolution des températures de la ville de Tawarano',
+      curveType: 'function',
+      legend: { position: 'bottom' }
+    };
+    var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+    chart.draw(dataTable, options);
+  }
+  // Récupération de données depuis notre API /tawarano/
+  fetch('/tawarano/')
+    .then(response => response.json())
+    .then(data => {
+      drawChart(data);
+    })
+}
+    </script>
   </body>
 </html>
