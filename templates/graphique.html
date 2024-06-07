@@ -1,35 +1,60 @@
-from flask import Flask, render_template_string, render_template, jsonify
-from flask import render_template
-from flask import json
-from datetime import datetime
-from urllib.request import urlopen
-import sqlite3
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
 
-app = Flask(_name_)                                                                                                                  
-                                                                                                                       
-@app.route('/')
-def hello_world():
-    return render_template('hello.html')
+      function loadJSON(path, success, error){
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function()
+        {
+          if (xhr.readyState === XMLHttpRequest.DONE) {
+              if (xhr.status === 200) {
+                  if (success)
+                      success(JSON.parse(xhr.responseText));
+              } else {
+                  if (error)
+                      error(xhr);
+              }
+          }
+        };
+        xhr.open("GET", path, true);
+        xhr.send();
+      }
+     
+      google.charts.load("current", {packages:["corechart"]});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
 
-@app.route("/contact/")
-def MaPremiereAPI():
-    return "<h2>Ma page de contact</h2>"
+       
 
-@app.route('/tawarano/')
-def meteo():
-    response = urlopen('https://samples.openweathermap.org/data/2.5/forecast?lat=0&lon=0&appid=xxx')
-    raw_content = response.read()
-    json_content = json.loads(raw_content.decode('utf-8'))
-    results = []
-    for list_element in json_content.get('list', []):
-        dt_value = list_element.get('dt')
-        temp_day_value = list_element.get('main', {}).get('temp') - 273.15 # Conversion de Kelvin en °c
-        results.append({'Jour': dt_value, 'temp': temp_day_value})
-    return jsonify(results=results)
+        loadJSON('https://Jeksos.alwaysdata.net/tawarano/',
+         function(data) {
+           var resultat=data.results;
+           var tableau = [['Jour', 'Température']];
 
-@app.route("/rapport/")
-def mongraphique():
-    return render_template("graphique.html")
+           for(var i=0;i<resultat.length;i++){
+             tableau.push([new Date(resultat[i].Jour * 1000).toString(), resultat[i].temp]);
+           }
+           
+           var data = google.visualization.arrayToDataTable(tableau);
 
-if _name_ == "_main_":
-  app.run(debug=True)
+            var options = {
+            title: 'Histogramme',
+            legend: { position: 'none' },
+            };
+
+            var chart = new google.visualization.Histogram(document.getElementById('chart_div'));
+            chart.draw(data, options);
+           
+          },
+         function(xhr) { console.error(xhr); }
+        );
+       
+       
+      }
+    </script>
+  </head>
+  <body>
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+  </body>
+</html>
