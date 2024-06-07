@@ -1,10 +1,3 @@
-fic S onia
-Sony Sons
-Ven 07/06/2024 12:33
-from flask import Flask, render_template_string, render_template, jsonify from flask import render_template from flask import json from datetime import datetime from urllib.request import urlopen import sqlite3 app = Flask(_name_) @app.route('/') def hello_world():
-Olivier Guerriau<oguerriau@gmail.com>
-​
-Vous​
 from flask import Flask, render_template, jsonify
 import json
 from datetime import datetime
