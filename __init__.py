@@ -53,8 +53,7 @@ def commit():
         commit = list_element.get('commit').get('message')
         author = list_element.get('commit').get('author').get('name')
         date_commit = list_element.get('commit').get('author').get('date')
-        results.append({'commit': commit, 'author': author,
-'date_commit': date_commit})
+        results.append({'commit': commit, 'author': author,'date_commit': date_commit})
 
     return jsonify(results=results)
 
@@ -68,15 +67,12 @@ def commit_date(date_string):
 
     filtered_commits = []
     for commit_info in json_content:
-        commit_date =
-datetime.strptime(commit_info.get('commit').get('author').get('date'),
-'%Y-%m-%dT%H:%M:%SZ')
+        commit_date =datetime.strptime(commit_info.get('commit').get('author').get('date'),'%Y-%m-%dT%H:%M:%SZ')
         if commit_date.minute == minutes:
             commit = commit_info.get('commit').get('message')
             author = commit_info.get('commit').get('author').get('name')
             date_commit = commit_info.get('commit').get('author').get('date')
-            filtered_commits.append({'commit': commit, 'author':
-author, 'date_commit': date_commit})
+            filtered_commits.append({'commit': commit, 'author':author, 'date_commit': date_commit})
 
     return jsonify(results=filtered_commits)
 
