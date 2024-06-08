@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,27 +15,47 @@
         async function fetchCommitsData() {
             const response = await fetch('/commits/data');
             const data = await response.json();
-            return data.commit_minutes;
+            return data.commit_minutes;	
         }
 
         function renderChart(commitMinutes) {
             const ctx = document.getElementById('commitsChart').getContext('2d');
             const chart = new Chart(ctx, {
-                type: 'line', // Vous pouvez aussi utiliser 'bar', 'pie', etc.
+                type: 'bar', // Changement de 'line' à 'bar' pour un graphique en bâton
                 data: {
-                    labels: commitMinutes.map((minute, index) => index + 1),
+                    labels: commitMinutes.map((minute, index) => `Commit ${index + 1}`),
                     datasets: [{
-                        label: 'Commits per Minute',
+                        label: 'Commits par Minute',
                         data: commitMinutes,
-                        borderColor: 'rgba(75, 192, 192, 1)',
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 1
                     }]
                 },
                 options: {
                     scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Commits'
+                            }
+                        },
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Minutes'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Graphique des Commits par Minute'
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
                         }
                     }
                 }
@@ -49,5 +68,3 @@
         });
     </script>
 </body>
-
-</html>
