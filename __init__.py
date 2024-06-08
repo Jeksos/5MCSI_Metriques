@@ -1,10 +1,7 @@
-from flask import Flask, render_template_string, render_template, jsonify
-from flask import render_template
-from flask import json
-
+from flask import Flask, render_template, jsonify, json
 from datetime import datetime
 from urllib.request import urlopen
-import sqlite3
+
 app = Flask(__name__)
 
 @app.route('/')
@@ -13,15 +10,18 @@ def hello_world():
 
 @app.route('/tawarano/')
 def meteo():
-    response = urlopen('https://samples.openweathermap.org/data/2.5/forecast?lat=0&lon=0&appid=xxx')
-    raw_content = response.read()
-    json_content = json.loads(raw_content.decode('utf-8'))
-    results = []
-    for list_element in json_content.get('list', []):
-        dt_value = list_element.get('dt')
-        temp_day_value = list_element.get('main', {}).get('temp') -273.15 # Conversion de Kelvin en °C
-        results.append({'Jour': dt_value, 'temp': temp_day_value})
-    return jsonify(results=results)
+    try:
+        response = urlopen('https://samples.openweathermap.org/data/2.5/forecast?lat=0&lon=0&appid=xxx')
+        raw_content = response.read()
+        json_content = json.loads(raw_content.decode('utf-8'))
+        results = []
+        for item in json_content['list']:
+            dt_value = item['dt']
+            temp_day_value = item['main']['temp'] - 273.15  # Conversion de Kelvin en °C
+            results.append({'Jour': dt_value, 'temp': temp_day_value})
+        return jsonify(results=results)
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
 @app.route("/rapport/")
 def mongraphique():
@@ -32,42 +32,43 @@ def histogramme():
     return render_template("histogramme.html")
 
 @app.route("/contact/")
-def MaPremiereAPI():
+def contact():
     return render_template('contact.html')
 
 @app.route('/commits')
-def commit():
-    response = urlopen('https://api.github.com/repos/Jeksos/5MCSI_Metriques/commits')
-    raw_content = response.read()
-    json_content = json.loads(raw_content.decode('utf-8'))
-    results = []
-
-    for list_element in json_content:
-        commit = list_element.get('commit').get('message')
-        author = list_element.get('commit').get('author').get('name')
-        date_commit = list_element.get('commit').get('author').get('date')
-        results.append({'commit': commit, 'author': author,'date_commit': date_commit})
-
-    return jsonify(results=results)
+def commits():
+    try:
+        response = urlopen('https://api.github.com/repos/Jeksos/5MCSI_Metriques/commits')
+        raw_content = response.read()
+        json_content = json.loads(raw_content.decode('utf-8'))
+        results = []
+        for item in json_content:
+            commit_message = item['commit']['message']
+            author = item['commit']['author']['name']
+            date_commit = item['commit']['author']['date']
+            results.append({'commit': commit_message, 'author': author, 'date_commit': date_commit})
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
 @app.route('/commits/<date_string>')
-def commit_date(date_string):
-    date_object = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
-    minutes = date_object.minute
-    response = urlopen('https://api.github.com/repos/Jeksos/5MCSI_Metriques/commits')
-    raw_content = response.read()
-    json_content = json.loads(raw_content.decode('utf-8'))
-
-    filtered_commits = []
-    for commit_info in json_content:
-        commit_date =datetime.strptime(commit_info.get('commit').get('author').get('date'),'%Y-%m-%dT%H:%M:%SZ')
-        if commit_date.minute == minutes:
-            commit = commit_info.get('commit').get('message')
-            author = commit_info.get('commit').get('author').get('name')
-            date_commit = commit_info.get('commit').get('author').get('date')
-            filtered_commits.append({'commit': commit, 'author':author, 'date_commit': date_commit})
-
-    return jsonify(results=filtered_commits)
+def commits_by_date(date_string):
+    try:
+        date_object = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
+        response = urlopen('https://api.github.com/repos/Jeksos/5MCSI_Metriques/commits')
+        raw_content = response.read()
+        json_content = json.loads(raw_content.decode('utf-8'))
+        filtered_commits = []
+        for item in json_content:
+            commit_date = datetime.strptime(item['commit']['author']['date'], '%Y-%m-%dT%H:%M:%SZ')
+            if commit_date.minute == date_object.minute:
+                commit_message = item['commit']['message']
+                author = item['commit']['author']['name']
+                date_commit = item['commit']['author']['date']
+                filtered_commits.append({'commit': commit_message, 'author': author, 'date_commit': date_commit})
+        return jsonify(results=filtered_commits)
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
 if __name__ == "__main__":
     app.run(debug=True)
