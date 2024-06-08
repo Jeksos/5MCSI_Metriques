@@ -1,5 +1,9 @@
-<html>
-  <head>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphique des Températures</title>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
 
@@ -23,27 +27,35 @@
      
       google.charts.load("current", {packages:["corechart"]});
       google.charts.setOnLoadCallback(drawChart);
+
       function drawChart() {
-
-       
-
-        loadJSON('https://Jeksos.alwaysdata.net/tawarano/',
+          loadJSON('https://Jeksos.alwaysdata.net/tawarano/',
          function(data) {
            var resultat=data.results;
-           var tableau = [['Jour', 'Température']];
+           var tableau = [['Jour', 'Température (°C)']];
 
            for(var i=0;i<resultat.length;i++){
-             tableau.push([new Date(resultat[i].Jour * 1000).toString(), resultat[i].temp]);
+             tableau.push([new Date(resultat[i].Jour * 1000).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }), resultat[i].temp]);
            }
            
            var data = google.visualization.arrayToDataTable(tableau);
 
             var options = {
-            title: 'Histogramme',
-            legend: { position: 'none' },
-            };
-
-            var chart = new google.visualization.Histogram(document.getElementById('chart_div'));
+            title: 'Prévisions Météo à Tawarano',
+            legend: {  position: 'top', alignment: 'center' },
+             hAxis: {
+                            title: 'Jour',
+                            format: 'dd MMM yyyy HH:mm',
+                            gridlines: { count: 15 }
+                        },
+                        vAxis: {
+                            title: 'Température (°C)',
+                            gridlines: { count: 10 }
+                        },
+                        colors: ['#76A7FA'],
+                        histogram: { bucketSize: 1 }
+                    };
+            var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
             chart.draw(data, options);
            
           },
@@ -55,6 +67,7 @@
     </script>
   </head>
   <body>
+	<h1>Graphique des Températures</h1>
     <div id="chart_div" style="width: 900px; height: 500px;"></div>
   </body>
 </html>
